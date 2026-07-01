@@ -1,0 +1,28 @@
+{
+  "admins": [
+    {
+      "id": "admin-1",
+      "email": "admin@lelu-consulting.com",
+      "password": "$2a$10$B3vDMKgumYYDvFZkOjWbse6B00/jIIe3Yk6n1ZpSzQ09RucHV2c..",
+      "name": "Admin User",
+      "role": "admin",
+      "isActive": true
+    }
+  ],
+  "customers": [],
+  "testimonials": [
+    {
+      "id": "6762df15-1a25-4c93-ae1d-023c21a2e461",
+      "name": "Grace",
+      "role": "Manader",
+      "company": "ACTPA",
+      "quote": "Thank you for your contribution in our company",
+      "image": "https://unsplash.com/photos/a-young-girl-with-long-hair-wearing-a-white-t-shirt-HaNi1rsZ6Nc",
+      "status": "pending",
+      "rating": 5,
+      "createdAt": "2026-07-01T06:02:29.586Z",
+      "updatedAt": "2026-07-01T06:02:29.586Z"
+    }
+  ],
+  "contactRequests": []
+}

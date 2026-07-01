@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lelu-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=development
+      - SESSION_SECRET=dev-secret-key-change-in-production
+      - ADMIN_EMAIL=admin@lelu-consulting.com
+      - ADMIN_PASSWORD=admin123456
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: node server.js
+    restart: unless-stopped
+    networks:
+      - lelu-network
+
+  frontend:
+    build:
+      context: ./website
+      dockerfile: Dockerfile
+    container_name: lelu-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./website:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - lelu-network
+
+networks:
+  lelu-network:
+    driver: bridge
+
+volumes:
+  backend_data:
+  frontend_data:
