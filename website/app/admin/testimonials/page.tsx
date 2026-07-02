@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -227,15 +228,17 @@ export default function AdminTestimonials() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((testimonial) => (
               <div key={testimonial._id} className="bg-white rounded-lg shadow-md p-6">
-                <img
+                <Image
                   src={testimonial.image}
                   alt={testimonial.name}
-                  className="w-16 h-16 rounded-full object-cover mb-4 border-2 border-blue-600"
+                  width={64}
+                  height={64}
+                  className="rounded-full object-cover mb-4 border-2 border-blue-600"
                 />
                 <h3 className="text-xl font-bold">{testimonial.name}</h3>
                 <p className="text-blue-600 font-semibold">{testimonial.role}</p>
                 <p className="text-gray-600 text-sm mb-4">{testimonial.company}</p>
-                <p className="text-gray-700 italic mb-4">"{testimonial.quote}"</p>
+                <p className="text-gray-700 italic mb-4">&quot;{testimonial.quote}&quot;</p>
 
                 <div className="flex gap-2 flex-wrap">
                   <span

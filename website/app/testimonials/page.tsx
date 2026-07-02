@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Testimonials() {
@@ -47,10 +48,12 @@ export default function Testimonials() {
             {testimonials.map((item, index) => (
               <div key={index} className="bg-gray-50 p-8 rounded-lg shadow-md">
                 <div className="flex items-center gap-4 mb-6">
-                  <img
+                  <Image
                     src={item.image}
                     alt={item.name}
-                    className="w-14 h-14 rounded-full object-cover border-2 border-blue-600"
+                    width={56}
+                    height={56}
+                    className="rounded-full object-cover border-2 border-blue-600"
                   />
                   <div>
                     <h3 className="text-xl font-bold">{item.name}</h3>
