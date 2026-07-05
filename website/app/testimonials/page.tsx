@@ -1,10 +1,25 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+interface Testimonial {
+  _id?: string;
+  name: string;
+  role: string;
+  company: string;
+  image?: string;
+  quote: string;
+  status?: string;
+  createdAt?: string;
+}
+
 export default function Testimonials() {
-  const testimonials = [
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const defaultTestimonials: Testimonial[] = [
     {
       name: 'Sarah M.',
       role: 'Operations Director',
@@ -31,6 +46,36 @@ export default function Testimonials() {
     },
   ];
 
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/testimonials', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const approved = Array.isArray(data) 
+            ? data.filter((t: Testimonial) => t.status === 'approved' || t.status === 'pending')
+            : [];
+          setTestimonials(approved.length > 0 ? approved : defaultTestimonials);
+        } else {
+          setTestimonials(defaultTestimonials);
+        }
+      } catch (err) {
+        console.error('Failed to fetch testimonials:', err);
+        setTestimonials(defaultTestimonials);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
   return (
     <div className="min-h-screen">
       <section className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-16 md:py-24">
@@ -44,28 +89,40 @@ export default function Testimonials() {
 
       <section className="py-20 md:py-32 bg-white">
         <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {testimonials.map((item, index) => (
-              <div key={index} className="bg-gray-50 p-8 rounded-lg shadow-md">
-                <div className="flex items-center gap-4 mb-6">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    width={56}
-                    height={56}
-                    className="rounded-full object-cover border-2 border-blue-600"
-                  />
-                  <div>
-                    <h3 className="text-xl font-bold">{item.name}</h3>
-                    <p className="text-blue-600 font-semibold">{item.role}</p>
-                    <p className="text-gray-500">{item.company}</p>
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {testimonials.map((item, index) => (
+                <div key={item._id || index} className="bg-gradient-to-br from-gray-50 to-gray-100 p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
+                  <div className="flex items-center gap-4 mb-6">
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        width={56}
+                        height={56}
+                        className="rounded-full object-cover border-2 border-blue-600"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                        {item.name.charAt(0)}
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">{item.name}</h3>
+                      <p className="text-blue-600 font-semibold text-sm">{item.role}</p>
+                      <p className="text-gray-500 text-sm">{item.company}</p>
+                    </div>
                   </div>
+                  <div className="text-blue-600 text-3xl font-serif mb-3 leading-none">&rdquo;</div>
+                  <p className="text-gray-700 text-base leading-relaxed italic">{item.quote}</p>
                 </div>
-                <div className="text-blue-600 text-4xl mb-4">“</div>
-                <p className="text-gray-700 text-lg leading-relaxed">{item.quote}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
