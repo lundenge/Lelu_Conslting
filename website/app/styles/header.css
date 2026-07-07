@@ -43,7 +43,7 @@
   background: linear-gradient(135deg, #2563eb 0%, #10b981 100%);
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.2);
 }
 
 .admin-login-btn:hover {
@@ -51,7 +51,7 @@
   opacity: 0.95;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 300px) {
   .site-nav {
     gap: 1rem;
   }

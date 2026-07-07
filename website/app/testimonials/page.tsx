@@ -19,37 +19,37 @@ export default function Testimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const defaultTestimonials: Testimonial[] = [
-    {
-      name: 'Sarah M.',
-      role: 'Operations Director',
-      company: 'BrightPath Logistics',
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-      quote:
-        'Lelu-Consulting transformed our reporting process with a custom dashboard and AI-powered forecasting. The results were visible in the first month.',
-    },
-    {
-      name: 'Daniel K.',
-      role: 'Founder',
-      company: 'Northstar Retail',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-      quote:
-        'Their team understood our business goals immediately and built a solution that scaled with our growth. Communication was excellent throughout the project.',
-    },
-    {
-      name: 'Mina A.',
-      role: 'HR Lead',
-      company: 'NovaCare Health',
-      image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80',
-      quote:
-        'We needed automation and insight from our data, and they delivered both. The implementation was smooth, practical, and highly professional.',
-    },
-  ];
-
   useEffect(() => {
+    const defaultTestimonials: Testimonial[] = [
+      {
+        name: 'Sarah M.',
+        role: 'Operations Director',
+        company: 'BrightPath Logistics',
+        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+        quote:
+          'Lelu-Consulting transformed our reporting process with a custom dashboard and AI-powered forecasting. The results were visible in the first month.',
+      },
+      {
+        name: 'Daniel K.',
+        role: 'Founder',
+        company: 'Northstar Retail',
+        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+        quote:
+          'Their team understood our business goals immediately and built a solution that scaled with our growth. Communication was excellent throughout the project.',
+      },
+      {
+        name: 'Mina A.',
+        role: 'HR Lead',
+        company: 'NovaCare Health',
+        image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80',
+        quote:
+          'We needed automation and insight from our data, and they delivered both. The implementation was smooth, practical, and highly professional.',
+      },
+    ];
+
     const fetchTestimonials = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/testimonials', {
+        const response = await fetch('http://localhost:5000/api/testimonials/public/approved', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -58,10 +58,8 @@ export default function Testimonials() {
         
         if (response.ok) {
           const data = await response.json();
-          const approved = Array.isArray(data) 
-            ? data.filter((t: Testimonial) => t.status === 'approved' || t.status === 'pending')
-            : [];
-          setTestimonials(approved.length > 0 ? approved : defaultTestimonials);
+          const testimonialList = Array.isArray(data) ? data : [];
+          setTestimonials(testimonialList.length > 0 ? testimonialList : defaultTestimonials);
         } else {
           setTestimonials(defaultTestimonials);
         }

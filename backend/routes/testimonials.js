@@ -1,41 +1,80 @@
 const express = require('express');
 const router = express.Router();
 const authenticate = require('../middleware/authenticate');
-const {
-  listTestimonials,
-  createTestimonial,
-  updateTestimonial,
-  deleteTestimonial,
-} = require('../storage');
+const Testimonial = require('../models/Testimonial');
 
-// Get all testimonials (with status filter)
-router.get('/', authenticate, (req, res) => {
+// Get approved testimonials (public - for frontend)
+router.get('/public/approved', async (req, res) => {
   try {
-    const { status } = req.query;
-    const testimonials = listTestimonials(status);
+    const testimonials = await Testimonial.find({ status: 'approved' }).sort({ createdAt: -1 });
     res.json(testimonials);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// Create testimonial
-router.post('/', authenticate, (req, res) => {
+// Get all testimonials (admin only)
+router.get('/', authenticate, async (req, res) => {
   try {
-    const testimonial = createTestimonial(req.body);
-    res.status(201).json(testimonial);
+    const { status } = req.query;
+    const query = status ? { status } : {};
+    const testimonials = await Testimonial.find(query).sort({ createdAt: -1 });
+    res.json(testimonials);
   } catch (error) {
-    res.status(400).json({ message: 'Validation error', error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// Approve testimonial
-router.put('/:id/approve', authenticate, (req, res) => {
+// Get single testimonial (admin only)
+router.get('/:id', authenticate, async (req, res) => {
   try {
-    const testimonial = updateTestimonial(req.params.id, {
-      status: 'approved',
-      approvedBy: req.session.adminId,
+    const testimonial = await Testimonial.findById(req.params.id);
+    if (!testimonial) {
+      return res.status(404).json({ message: 'Testimonial not found' });
+    }
+    res.json(testimonial);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Create testimonial (admin only)
+router.post('/', authenticate, async (req, res) => {
+  try {
+    const { name, role, company, quote, image, rating } = req.body;
+
+    if (!name || !role || !company || !quote || !image) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const testimonial = new Testimonial({
+      name,
+      role,
+      company,
+      quote,
+      image,
+      rating: rating || 5,
+      status: 'pending',
     });
+
+    await testimonial.save();
+    res.status(201).json({ message: 'Testimonial created successfully', data: testimonial });
+  } catch (error) {
+    res.status(400).json({ message: 'Validation error', error: error.message });
+  }
+});
+
+// Approve testimonial (admin only)
+router.put('/:id/approve', authenticate, async (req, res) => {
+  try {
+    const testimonial = await Testimonial.findByIdAndUpdate(
+      req.params.id,
+      {
+        status: 'approved',
+        approvedBy: req.session.adminId,
+      },
+      { new: true }
+    );
     if (!testimonial) {
       return res.status(404).json({ message: 'Testimonial not found' });
     }
@@ -45,10 +84,14 @@ router.put('/:id/approve', authenticate, (req, res) => {
   }
 });
 
-// Reject testimonial
-router.put('/:id/reject', authenticate, (req, res) => {
+// Reject testimonial (admin only)
+router.put('/:id/reject', authenticate, async (req, res) => {
   try {
-    const testimonial = updateTestimonial(req.params.id, { status: 'rejected' });
+    const testimonial = await Testimonial.findByIdAndUpdate(
+      req.params.id,
+      { status: 'rejected' },
+      { new: true }
+    );
     if (!testimonial) {
       return res.status(404).json({ message: 'Testimonial not found' });
     }
@@ -58,10 +101,14 @@ router.put('/:id/reject', authenticate, (req, res) => {
   }
 });
 
-// Update testimonial
-router.put('/:id', authenticate, (req, res) => {
+// Update testimonial (admin only)
+router.put('/:id', authenticate, async (req, res) => {
   try {
-    const testimonial = updateTestimonial(req.params.id, req.body);
+    const testimonial = await Testimonial.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
     if (!testimonial) {
       return res.status(404).json({ message: 'Testimonial not found' });
     }
@@ -71,10 +118,10 @@ router.put('/:id', authenticate, (req, res) => {
   }
 });
 
-// Delete testimonial
-router.delete('/:id', authenticate, (req, res) => {
+// Delete testimonial (admin only)
+router.delete('/:id', authenticate, async (req, res) => {
   try {
-    const testimonial = deleteTestimonial(req.params.id);
+    const testimonial = await Testimonial.findByIdAndDelete(req.params.id);
     if (!testimonial) {
       return res.status(404).json({ message: 'Testimonial not found' });
     }
@@ -85,3 +132,4 @@ router.delete('/:id', authenticate, (req, res) => {
 });
 
 module.exports = router;
+

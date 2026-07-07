@@ -13,7 +13,7 @@ export default function Header() {
       <nav className="container-custom flex justify-between items-center py-4">
         <Link href="/" className="site-logo gradient-text">
           <Image
-            src="/images/logo.svg"
+            src="/images/logo.png"
             alt="Lelu Consulting logo"
             width={44}
             height={44}
